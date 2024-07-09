@@ -1,0 +1,11 @@
+[package]
+edition = "2021"
+name = "repository"
+version = "0.0.0"
+
+[build-dependencies]
+bindgen = "0.65.1"
+system-deps = "2.0"
+
+[package.metadata.system-deps]
+girepo = { name = "girepository-2.0", version = "2.80.3" }
