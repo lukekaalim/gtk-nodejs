@@ -47,7 +47,7 @@ fn generate_info_cache() -> InfoCache {
 }
 
 pub fn get_info_type(info: *mut GIBaseInfo) -> GTypeUnion {
-  // pass this as an arg to avoid recomputing it all the time
+  // TODO: pass this as an arg to avoid recomputing it all the time
   let info_cache = generate_info_cache();
 
   if unsafe { g_type_check_instance_is_a(info.cast(), info_cache.function_info_type) == 1 } {

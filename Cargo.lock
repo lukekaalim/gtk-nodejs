@@ -88,6 +88,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "common"
+version = "0.0.0"
+dependencies = [
+ "napi",
+ "napi-derive",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -141,12 +149,7 @@ checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 name = "gtk-nodejs"
 version = "0.0.0"
 dependencies = [
- "bindgen",
  "generation",
- "napi",
- "napi-build",
- "napi-derive",
- "system-deps",
 ]
 
 [[package]]
@@ -313,6 +316,7 @@ name = "output"
 version = "0.0.0"
 dependencies = [
  "bindgen",
+ "common",
  "napi",
  "napi-build",
  "napi-derive",

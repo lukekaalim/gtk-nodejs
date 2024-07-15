@@ -12,13 +12,15 @@ pub struct ProjectConfig {
 
   pub loaded_namespaces: Vec<String>,
 
-  pub implementation_path: String
+  pub implementation_path: String,
+  pub generated_path: String
 }
 
 pub fn generate_project(
   namespace: &str,
   version: &str,
   implementation_path: &str, // The rust type path for the bindgen code (where all the types and functions are)
+  generated_path: &str, // The rust path to where the generated namespaces will live (so they can reference each other)
   output_directory: &PathBuf
 ) {
   /*
@@ -38,11 +40,13 @@ pub fn generate_project(
     repo,
     root_namespace: namespace.to_string(),
     loaded_namespaces: Vec::new(),
+    generated_path: generated_path.to_string(),
     implementation_path: implementation_path.to_string()
   };
 
   create_dir_all(namespace_dir.clone()).unwrap();
   let mut namespace_lib_scope = codegen::Scope::new();
+  namespace_lib_scope.raw("#![allow(warnings)]");
   namespace_lib_scope.raw("mod structs;");
   namespace_lib_scope.raw("mod functions;");
   namespace_lib_scope.raw("pub use functions::*;");
@@ -62,6 +66,9 @@ pub fn generate_project(
     let mut file = File::create(path.clone()).unwrap();
     file.write_all(scope.to_string().as_bytes()).unwrap();
   }
+  let mut error_file = File::create(namespace_dir.join("errors.log")).unwrap();
+
+  error_file.write_all(ns_output.errors.join("\n\n").as_bytes()).unwrap();
 }
 
 fn require_namespace(repo: *mut GIRepository, namespace: &str, version: &str) -> Result<*mut GITypelib, String> {

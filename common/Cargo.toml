@@ -1,0 +1,8 @@
+[package]
+edition = "2021"
+name = "common"
+version = "0.0.0"
+
+[dependencies]
+napi = { version = "2.12.2", default-features = false, features = ["napi6"] }
+napi-derive = "2.12.2"

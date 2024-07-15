@@ -19,11 +19,31 @@ pub fn generate_struct(ns_config: &NamespaceConfig, struct_info: *mut GIStructIn
   let fields = Vec::new();
   let mut scope = codegen::Scope::new();
 
+  let c_type_path = format!("{}::{}", ns_config.project.implementation_path, c_name);
+
   scope.import("napi_derive", "napi");
 
-  scope.new_struct(&rs_name)
+  let generated_struct = scope.new_struct(&rs_name)
     .vis("pub")
     .attr("napi");
+
+  let c_type = codegen::Type::new(format!("*mut {c_type_path}"));
+  let rs_type = codegen::Type::new(&rs_name);
+  
+  generated_struct.new_field("ptr", c_type.clone());
+
+  let inner_impl = scope.new_impl(&rs_name);
+  let inner_impl_constructor = inner_impl.new_fn("new")
+    .arg("ptr", c_type.clone())
+    .vis("pub")
+    .ret(rs_type)
+    .line(format!("return {rs_name} {{ ptr }};"));
+
+  let inner_impl_reader = inner_impl.new_fn("read")
+    .arg_ref_self()
+    .vis("pub")
+    .ret(c_type)
+    .line(format!("return self.ptr;"));
   
   return Ok(StructOutput {
     g_name,

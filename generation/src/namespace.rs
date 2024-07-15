@@ -16,6 +16,7 @@ pub struct NamespaceConfig {
   pub namespace_cstr: CString,
 
   pub c_prefix: String,
+  pub namespace_path: String,
   pub project: ProjectConfig,
 }
 pub struct NamespaceOutput {
@@ -35,8 +36,6 @@ fn get_infos_from_repo(repo: *mut GIRepository, namespace: &str) -> Vec<*mut GIB
 
   let count = unsafe { gi_repository_get_n_infos(repo, namespace_cstr.as_ptr()) };
 
-  println!("count");
-
   let mut infos = Vec::new();
   for i in 0..count {
     let info = unsafe { gi_repository_get_info(repo, namespace_cstr.as_ptr(), i) };
@@ -50,10 +49,11 @@ pub fn generate_namespace_types(project: &ProjectConfig, namespace: &str) -> Nam
   let c_prefix = copy_c_string(unsafe {
     gi_repository_get_c_prefix(project.repo, namespace_cstr.as_ptr())
   });
-  println!("C Prefix: {}", c_prefix);
+  
   let ns_conf = NamespaceConfig {
     namespace: namespace.to_string(),
     namespace_cstr,
+    namespace_path: format!("{}::{}", project.generated_path, namespace.to_case(Case::Snake)),
 
     c_prefix,
     project: project.clone(),
@@ -69,11 +69,12 @@ pub fn generate_namespace_types(project: &ProjectConfig, namespace: &str) -> Nam
 
   let infos = get_infos_from_repo(ns_conf.project.repo, namespace);
   for info in infos {
+    let name = copy_c_string(unsafe { gi_base_info_get_name(info) });
     match get_info_type(info) {
       GTypeUnion::FunctionInfo(func_info) =>
         match generate_function(&ns_conf, func_info) {
           Ok(func_output) => { ns_output.functions.push(func_output); },
-          Err(err) => { ns_output.errors.push(err.to_string()) },
+          Err(err) => { ns_output.errors.push(format!("{name}: {err}")) },
         },
       GTypeUnion::StructInfo(struct_info) =>
       match generate_struct(&ns_conf, struct_info) {
