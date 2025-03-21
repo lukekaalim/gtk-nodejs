@@ -8,8 +8,10 @@ generation = { path = "generation" }
 
 [workspace]
 members = [
-  "repository",
-  "generation",
-  "common",
-  "output"
+  #"repository",
+  #"generation",
+  #"common",
+  #"output"
+  "introspection",
+  "generation_classic"
 ]

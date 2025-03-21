@@ -1,0 +1,9 @@
+[package]
+edition = "2021"
+name = "generation_classic"
+version = "0.0.0"
+
+[dependencies]
+introspection = { path = "../introspection" }
+codegen = "0.2.0"
+convert_case = "0.6.0"
